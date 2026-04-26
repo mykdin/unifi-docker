@@ -17,7 +17,7 @@ body:
     attributes:
       label: Operating system
       description: "Which operating system do you use? Please provide the version as well."
-      placeholder: "Ubuntu Linux 20.04.3 LTS"
+      placeholder: "Ubuntu Linux 24.04 LTS"
     validations:
       required: true
   - type: input
