@@ -63,7 +63,7 @@ RUN set -ex \
  && /usr/local/bin/docker-build.sh "${PKGURL}"
 
 COPY --from=permset /out/permset /usr/local/bin/permset
-RUN chown 0.0 /usr/local/bin/permset && \
+RUN chown 0:0 /usr/local/bin/permset && \
     chmod +s /usr/local/bin/permset
 
 RUN mkdir -p /unifi && chown unifi:unifi -R /unifi
