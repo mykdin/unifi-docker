@@ -43,19 +43,21 @@ apt-get install -qy --no-install-recommends \
 echo 'deb https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/100-ubnt-unifi.list
 tryfail apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 06E85760C0A52C50
 
-# MongoDB is no longer shipped in Ubuntu's official repos (since 22.04),
-# so add MongoDB's own repo to satisfy the unifi package's mongodb-org-server dependency.
-# unifi requires mongodb-org-server >= 3.6.0 and < 8.1.0. On Ubuntu 24.04 (noble),
-# MongoDB 8.0 is currently the only series with a published apt repo, and 8.0.x
-# fits the upper bound (< 8.1.0).
+# MongoDB is not in Debian/Ubuntu base repos at the version UniFi needs, so add MongoDB's apt repo.
+# unifi requires mongodb-org-server >= 3.6.0 and < 8.1.0; MongoDB 8.0.x satisfies that.
 MONGO_VERSION=8.0
 . /etc/os-release
 case "$(dpkg --print-architecture)" in
     amd64|arm64)
         curl -fsSL "https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc" \
             | gpg --dearmor -o "/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg"
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg ] https://repo.mongodb.org/apt/ubuntu ${UBUNTU_CODENAME}/mongodb-org/${MONGO_VERSION} multiverse" \
-            > /etc/apt/sources.list.d/mongodb-org-${MONGO_VERSION}.list
+        if [ "${ID}" = "debian" ]; then
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg ] https://repo.mongodb.org/apt/debian ${VERSION_CODENAME}/mongodb-org/${MONGO_VERSION} main" \
+                > /etc/apt/sources.list.d/mongodb-org-${MONGO_VERSION}.list
+        else
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg ] https://repo.mongodb.org/apt/ubuntu ${UBUNTU_CODENAME}/mongodb-org/${MONGO_VERSION} multiverse" \
+                > /etc/apt/sources.list.d/mongodb-org-${MONGO_VERSION}.list
+        fi
         ;;
 esac
 
