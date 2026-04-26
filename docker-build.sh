@@ -3,27 +3,6 @@
 # fail on error
 set -e
 
-# Retry 5 times with a wait of 10 seconds between each retry
-tryfail() {
-    for i in $(seq 1 5);
-        do [ $i -gt 1 ] && sleep 10; $* && s=0 && break || s=$?; done;
-    (exit $s)
-}
-
-# Try multiple keyservers in case of failure
-addKey() {
-    for server in $(shuf -e ha.pool.sks-keyservers.net \
-        hkp://p80.pool.sks-keyservers.net:80 \
-        keyserver.ubuntu.com \
-        hkp://keyserver.ubuntu.com:80 \
-        pgp.mit.edu) ; do \
-        if apt-key adv --keyserver "$server" --recv "$1"; then
-            exit 0
-        fi
-    done
-    return 1
-}
-
 if [ "x${1}" == "x" ]; then
     echo please pass PKGURL as an environment variable
     exit 0
@@ -80,7 +59,7 @@ apt-get update
 apt-get install -qy --no-install-recommends \
     libcap2-bin \
     procps \
-    temurin-25-jre-headless \
+    temurin-25-jre \
     tzdata
 
 curl -L -o ./unifi.deb "${1}"
