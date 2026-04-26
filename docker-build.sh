@@ -32,21 +32,32 @@ fi
 apt-get update
 apt-get install -qy --no-install-recommends \
     apt-transport-https \
+    ca-certificates \
     curl \
     dirmngr \
     gpg \
     gpg-agent \
-    openjdk-17-jre-headless \
-    procps \
-    libcap2-bin \
-    tzdata
-echo 'deb https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/100-ubnt-unifi.list
-tryfail apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 06E85760C0A52C50
+    wget
+
+# Java 25 — UniFi 10.3+ .deb depends on temurin-25-jre (or equivalent); Bookworm/Ubuntu LTS repos do not ship it.
+curl -fsSL https://packages.adoptium.net/artifactory/api/gpg/key/public \
+    | gpg --dearmor -o /etc/apt/trusted.gpg.d/adoptium.gpg
+. /etc/os-release
+ADOPTIUM_CODENAME="${VERSION_CODENAME}"
+if [ "${ID}" = "ubuntu" ] && [ -n "${UBUNTU_CODENAME:-}" ]; then
+    ADOPTIUM_CODENAME="${UBUNTU_CODENAME}"
+fi
+echo "deb https://packages.adoptium.net/artifactory/deb ${ADOPTIUM_CODENAME} main" \
+    | tee /etc/apt/sources.list.d/adoptium.list
+
+gpg --no-default-keyring --keyring /usr/share/keyrings/ubiquiti-unifi.gpg \
+    --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 06E85760C0A52C50
+echo 'deb [signed-by=/usr/share/keyrings/ubiquiti-unifi.gpg] https://www.ui.com/downloads/unifi/debian stable ubiquiti' \
+    | tee /etc/apt/sources.list.d/100-ubnt-unifi.list
 
 # MongoDB is not in Debian/Ubuntu base repos at the version UniFi needs, so add MongoDB's apt repo.
 # unifi requires mongodb-org-server >= 3.6.0 and < 8.1.0; MongoDB 8.0.x satisfies that.
 MONGO_VERSION=8.0
-. /etc/os-release
 case "$(dpkg --print-architecture)" in
     amd64|arm64)
         curl -fsSL "https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc" \
@@ -66,6 +77,11 @@ if [ -d "/usr/local/docker/pre_build/$(dpkg --print-architecture)" ]; then
 fi
 
 apt-get update
+apt-get install -qy --no-install-recommends \
+    libcap2-bin \
+    procps \
+    temurin-25-jre-headless \
+    tzdata
 
 curl -L -o ./unifi.deb "${1}"
 # --no-install-recommends keeps the image lean and avoids pulling in
