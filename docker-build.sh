@@ -66,7 +66,10 @@ fi
 apt-get update
 
 curl -L -o ./unifi.deb "${1}"
-apt -qy install ./unifi.deb
+# --no-install-recommends keeps the image lean and avoids pulling in
+# systemd-resolved (a Recommends of systemd), whose postinst tries to replace
+# the bind-mounted /etc/resolv.conf during `docker build` and fails noisily.
+apt -qy install --no-install-recommends ./unifi.deb
 rm -f ./unifi.deb
 chown -R unifi:unifi /usr/lib/unifi
 rm -rf /var/lib/apt/lists/*
