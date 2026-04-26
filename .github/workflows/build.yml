@@ -5,8 +5,8 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  TEST_TAG: jacobalberty/unifi:test
-  PKGURL: https://dl.ui.com/unifi/6.5.55/unifi_sysvinit_all.deb
+  TEST_TAG: mykdin/unifi:test
+  PKGURL: https://dl.ui.com/unifi/10.3.55/unifi_sysvinit_all.deb
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=jacobalberty/unifi
+          DOCKER_IMAGE=mykdin/unifi
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
