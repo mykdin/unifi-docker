@@ -29,8 +29,10 @@ fi
 echo "deb https://packages.adoptium.net/artifactory/deb ${ADOPTIUM_CODENAME} main" \
     | tee /etc/apt/sources.list.d/adoptium.list
 
-gpg --no-default-keyring --keyring /usr/share/keyrings/ubiquiti-unifi.gpg \
-    --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 06E85760C0A52C50
+# HTTPS key fetch — HKP keyservers often fail under buildx/QEMU (gpg exits 2: no dirmngr / timeout).
+mkdir -p /usr/share/keyrings
+curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x06E85760C0A52C50' \
+    | gpg --dearmor -o /usr/share/keyrings/ubiquiti-unifi.gpg
 echo 'deb [signed-by=/usr/share/keyrings/ubiquiti-unifi.gpg] https://www.ui.com/downloads/unifi/debian stable ubiquiti' \
     | tee /etc/apt/sources.list.d/100-ubnt-unifi.list
 
