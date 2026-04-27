@@ -37,8 +37,8 @@ echo 'deb [signed-by=/usr/share/keyrings/ubiquiti-unifi.gpg] https://www.ui.com/
     | tee /etc/apt/sources.list.d/100-ubnt-unifi.list
 
 # MongoDB is not in Debian/Ubuntu base repos at the version UniFi needs, so add MongoDB's apt repo.
-# unifi requires mongodb-org-server >= 3.6.0 and < 8.1.0; MongoDB 8.0.x satisfies that.
-MONGO_VERSION=8.0
+# unifi requires mongodb-org-server >= 3.6.0 and < 8.1.0; MongoDB 7.0 LTS satisfies that.
+MONGO_VERSION=7.0
 case "$(dpkg --print-architecture)" in
     amd64|arm64)
         curl -fsSL "https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc" \
@@ -60,6 +60,7 @@ fi
 apt-get update
 apt-get install -qy --no-install-recommends \
     libcap2-bin \
+    mongodb-org-server \
     procps \
     temurin-25-jre \
     tzdata
