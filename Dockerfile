@@ -1,10 +1,10 @@
-FROM golang:1.24-bullseye AS permset
+FROM golang:1.24-bookworm AS permset
 WORKDIR /src
 RUN git clone https://github.com/jacobalberty/permset.git /src && \
     mkdir -p /out && \
     go build -ldflags "-X main.chownDir=/unifi" -o /out/permset
 
-FROM ubuntu:24.04
+FROM debian:bookworm-slim
 
 #LABEL maintainer="Jacob Alberty <jacob.alberty@foundigital.com>"
 
