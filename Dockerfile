@@ -10,7 +10,7 @@ FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG PKGURL=https://dl.ui.com/unifi/10.3.55/unifi_sysvinit_all.deb
+ARG PKGURL=https://dl.ui.com/unifi/10.4.57/unifi_sysvinit_all.deb
 
 ENV BASEDIR=/usr/lib/unifi \
     DATADIR=/unifi/data \
