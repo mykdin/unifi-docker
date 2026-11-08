@@ -67,6 +67,7 @@ jobs:
           docker stop unifitest
 
       - name: Build Docker image
+        id: docker_build
         uses: docker/build-push-action@v7
         with:
           context: .
