@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   update-unifi:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repo
@@ -49,6 +49,10 @@ jobs:
         if: steps.git_diff.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
+          # GITHUB_TOKEN can only open PRs when "Allow GitHub Actions to create and
+          # approve pull requests" is enabled in the repo settings. Alternatively,
+          # provide a PAT (contents + pull-requests write) as the UPDATE_PR_TOKEN secret.
+          token: ${{ secrets.UPDATE_PR_TOKEN || github.token }}
           branch: update-${{ steps.update.outputs.version }}
           title: "Update UniFi Network Application to v${{ steps.update.outputs.version }}"
           commit-message: "Update UniFi Network Application to v${{ steps.update.outputs.version }}"
